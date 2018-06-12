@@ -29,6 +29,13 @@ exports.open = function(uri, success, error, trustAllCertificates) {
   }
 };
 
+exports.openSignature = function(uri, success, error, trustAllCertificates) {
+  if (!uri || arguments.length === 0) { return false; }
+  uri = encodeURI(uri);
+  exec(onSuccess.bind(this, uri, success),
+       onError.bind(this, error), 'Open', 'openSignature', [uri]);
+};
+
 /**
  * downloadAndOpen
  *

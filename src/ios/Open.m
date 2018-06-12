@@ -28,9 +28,9 @@
         QLPreviewController *previewCtrl = [[QLPreviewController alloc] init];
         previewCtrl.delegate = self;
         previewCtrl.dataSource = self;
-          
+
         [previewCtrl.navigationItem setRightBarButtonItem:nil];
-          
+
         dispatch_async(dispatch_get_main_queue(), ^{
           [self.viewController presentViewController:previewCtrl animated:YES completion:nil];
         });
@@ -52,6 +52,27 @@
     [self.commandDelegate sendPluginResult:commandResult
                                 callbackId:command.callbackId];
   }];
+}
+
+- (void)openSignature: (CDVInvokedUrlCommand *)command {
+   self.callbackId = command.callbackId;
+
+   [self.commandDelegate runInBackground:^{
+       CDVPluginResult* commandResult = nil;
+       NSString *path = [command.arguments objectAtIndex:0];
+       NSURL *url = [NSURL URLWithString:path];
+       CGRect webViewBounds = self.view.bounds;
+       UIWebView *webView = [[UIWebView alloc] initWithFrame:webViewBounds];
+       NSURLRequest *request = [NSURLRequest requestWithURL:url];
+       [webView loadRequest:request];
+       [self.view addSubview:webView];
+
+       self.fileUrl = url;
+
+       commandResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@""];
+       [commandResult setKeepCallback:[NSNumber numberWithBool:YES]];
+       [self.commandDelegate sendPluginResult:commandResult callbackId:command.callbackId];
+   }];
 }
 
 #pragma - QLPreviewControllerDataSource Protocol
